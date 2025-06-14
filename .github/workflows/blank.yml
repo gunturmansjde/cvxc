@@ -1,11 +1,12 @@
-name: Run 
+name: Run Traffmonetizer Parallel
 
 on:
   schedule:
-    - cron: '0 */6 * * *'  # setiap 6 jam sekali
+    - cron: '0 */6 * * *'  # Jalan otomatis tiap 6 jam
+  workflow_dispatch:       # Bisa dijalankan manual juga
 
 jobs:
-  run-wipter:
+  run-traff:
     runs-on: ubuntu-latest
 
     strategy:
@@ -14,20 +15,14 @@ jobs:
       max-parallel: 20
 
     steps:
-      - name: Jalankan Docker Wipter ${{ matrix.instance }}
+      - name: Jalankan traffmonetizer ${{ matrix.instance }}
         run: |
-          docker run -d \
-            --name docker-wipter-${{ matrix.instance }} \
-            -e WIPTER_EMAIL="vjguntur0+${{ matrix.instance }}@gmail.com" \
-            -e WIPTER_PASSWORD="Wildan123@" \
-            -e DISCORD_WEBHOOK_INTERVAL=300 \
-            -e DISCORD_WEBHOOK_URL="https://discord.com/api/webhooks/1382948191137435688/emuut6Jky0wwLDH5lrHINxGLeZcFuKcOT2PycLcul1lW6fh-BjW24kdV7VbEtjafr45B" \
-            -e VNC_PASS="123456" \
-            -e VNC_PORT=$((5555 + ${{ matrix.instance }})) \
-            -e NOVNC_PORT=$((6666 + ${{ matrix.instance }})) \
-            -p $((5555 + ${{ matrix.instance }})):$((5555 + ${{ matrix.instance }})) \
-            -p $((6666 + ${{ matrix.instance }})):$((6666 + ${{ matrix.instance }})) \
-            --shm-size=2gb \
-            ghcr.io/techroy23/docker-wipter:latest
-      - name: Tahan agar tetap jalan
-        run: sleep infinity
+          echo "Menjalankan instance ${{ matrix.instance }}"
+
+          curl -O https://raw.githubusercontent.com/tiennm99/traffmonetizer/master/run.sh
+          chmod +x run.sh
+
+          sudo bash run.sh yxJ+/sZpOy5mP/VdagnR2kqgsa9o0krCw+Uc/XZnlgE= &
+
+          # Tahan 6 jam biar job tetap hidup
+          sleep 21600
