@@ -19,7 +19,7 @@ jobs:
         run: |
           VNC_PORT=$((5555 + ${{ matrix.instance }}))
           NOVNC_PORT=$((6666 + ${{ matrix.instance }}))
-          EMAIL="vjguntur0+${{ matrix.instance }}@gmail.com"
+          EMAIL="vjguntur0@gmail.com"
 
           echo "Running instance ${{ matrix.instance }} on VNC:$VNC_PORT, noVNC:$NOVNC_PORT"
 
