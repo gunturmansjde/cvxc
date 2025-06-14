@@ -2,9 +2,7 @@ name: Run Max Docker on Free Tier
 
 on:
   schedule:
-    - cron: '*/5 * * * *'
-    - cron: '* * * * *'  # setiap 1 menit
-  workflow_dispatch:
+    - cron: '0 */6 * * *'  # setiap 6 jam sekali
 
 jobs:
   run-wipter:
@@ -12,8 +10,7 @@ jobs:
 
     strategy:
       matrix:
-        instance: [1,2,3,4,5,6,7,8,9,10,
-                   11,12,13,14,15,16,17,18,19,20]
+        instance: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
       max-parallel: 20
 
     steps:
@@ -32,3 +29,5 @@ jobs:
             -p $((6666 + ${{ matrix.instance }})):$((6666 + ${{ matrix.instance }})) \
             --shm-size=2gb \
             ghcr.io/techroy23/docker-wipter:latest
+      - name: Tahan agar tetap jalan
+        run: sleep infinity
