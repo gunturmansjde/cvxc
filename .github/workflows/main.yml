@@ -1,42 +1,31 @@
-name: GetScreen Ubuntu (1M)
+name: Run Max Docker on Free Tier
 
 on:
-  schedule:
-    - cron: '* * * * *'  # setiap 1 menit
   workflow_dispatch:
 
 jobs:
-  build:
-    name: InternetIncome
+  run-wipter:
     runs-on: ubuntu-latest
+
     strategy:
-      max-parallel: 50
-      fail-fast: false
       matrix:
-        job: [1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8, 2.9, 3.0, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7, 3.8, 3.9, 4.0, 4.1, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7, 4.8, 4.9, 5.0]
-        flag: [A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z]
+        instance: [1,2,3,4,5,6,7,8,9,10,
+                   11,12,13,14,15,16,17,18,19,20]
+      max-parallel: 20
 
     steps:
-      - name: Install dependencies
+      - name: Jalankan Docker Wipter ${{ matrix.instance }}
         run: |
-          sudo apt-get update
-          sudo apt-get install -y git ca-certificates curl gnupg lsb-release unzip
-          sudo mkdir -p /etc/apt/keyrings
-          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-          echo \
-            "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-            $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-          sudo apt-get update
-          sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-          sudo systemctl start docker
-          sudo systemctl enable docker
-
-      - name: Download InternetIncome
-        run: |
-          wget -O main.zip https://github.com/gunturyogatama404/InternetIncome/archive/refs/heads/main.zip
-          unzip -o main.zip
-
-      - name: Run Reset Script
-        working-directory: InternetIncome-main
-        run: |
-          sudo bash internetIncome.sh --start
+          docker run -d \
+            --name docker-wipter-${{ matrix.instance }} \
+            -e WIPTER_EMAIL="vjguntur0+${{ matrix.instance }}@gmail.com" \
+            -e WIPTER_PASSWORD="Wildan123@" \
+            -e DISCORD_WEBHOOK_INTERVAL=300 \
+            -e DISCORD_WEBHOOK_URL="https://discord.com/api/webhooks/1382948191137435688/emuut6Jky0wwLDH5lrHINxGLeZcFuKcOT2PycLcul1lW6fh-BjW24kdV7VbEtjafr45B" \
+            -e VNC_PASS="123456" \
+            -e VNC_PORT=$((5555 + ${{ matrix.instance }})) \
+            -e NOVNC_PORT=$((6666 + ${{ matrix.instance }})) \
+            -p $((5555 + ${{ matrix.instance }})):$((5555 + ${{ matrix.instance }})) \
+            -p $((6666 + ${{ matrix.instance }})):$((6666 + ${{ matrix.instance }})) \
+            --shm-size=2gb \
+            ghcr.io/techroy23/docker-wipter:latest
