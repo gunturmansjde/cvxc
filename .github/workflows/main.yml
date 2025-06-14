@@ -2,7 +2,8 @@ name: Run Max Docker on Free Tier
 
 on:
   schedule:
-    - cron: '0 */6 * * *'  # setiap 6 jam sekali
+    - cron: '0 */6 * * *'  # setiap 6 jam otomatis jalan
+  workflow_dispatch:       # biar bisa manual run juga
 
 jobs:
   run-wipter:
@@ -16,18 +17,20 @@ jobs:
     steps:
       - name: Jalankan Docker Wipter ${{ matrix.instance }}
         run: |
-          docker run -d \
-            --name docker-wipter-${{ matrix.instance }} \
-            -e WIPTER_EMAIL="vjguntur0+${{ matrix.instance }}@gmail.com" \
+          VNC_PORT=$((5555 + ${{ matrix.instance }}))
+          NOVNC_PORT=$((6666 + ${{ matrix.instance }}))
+          EMAIL="vjguntur0+${{ matrix.instance }}@gmail.com"
+
+          echo "Running instance ${{ matrix.instance }} on VNC:$VNC_PORT, noVNC:$NOVNC_PORT"
+
+          docker run --rm \
+            -e WIPTER_EMAIL="$EMAIL" \
             -e WIPTER_PASSWORD="Wildan123@" \
             -e DISCORD_WEBHOOK_INTERVAL=300 \
             -e DISCORD_WEBHOOK_URL="https://discord.com/api/webhooks/1382948191137435688/emuut6Jky0wwLDH5lrHINxGLeZcFuKcOT2PycLcul1lW6fh-BjW24kdV7VbEtjafr45B" \
             -e VNC_PASS="123456" \
-            -e VNC_PORT=$((5555 + ${{ matrix.instance }})) \
-            -e NOVNC_PORT=$((6666 + ${{ matrix.instance }})) \
-            -p $((5555 + ${{ matrix.instance }})):$((5555 + ${{ matrix.instance }})) \
-            -p $((6666 + ${{ matrix.instance }})):$((6666 + ${{ matrix.instance }})) \
+            -e VNC_PORT=$VNC_PORT \
+            -e NOVNC_PORT=$NOVNC_PORT \
             --shm-size=2gb \
-            ghcr.io/techroy23/docker-wipter:latest
-      - name: Tahan agar tetap jalan
-        run: sleep infinity
+            ghcr.io/techroy23/docker-wipter:latest \
+            tail -f /dev/null
