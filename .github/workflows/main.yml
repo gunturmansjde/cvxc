@@ -1,6 +1,9 @@
 name: Run Max Docker on Free Tier
 
 on:
+  schedule:
+    - cron: '*/5 * * * *'
+    - cron: '* * * * *'  # setiap 1 menit
   workflow_dispatch:
 
 jobs:
